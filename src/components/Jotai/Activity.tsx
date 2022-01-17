@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import { isActivityReadyAtom, isClubReadyAtom } from "./App";
+import { isActivityReadyAtom, isClubReadyAtom } from "./Jotai";
 
 const Activity = () => {
   const [isClubReady] = useAtom(isClubReadyAtom);

@@ -1,73 +1,36 @@
-import { StatusBar } from "expo-status-bar";
-import { atom, useAtom } from "jotai";
-import React, { useEffect } from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
-import Activity from "./Activity";
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { screensComponents } from "./src/screens";
+import { screensNames } from "./src/constants/screenConfigs";
+const Stack = createNativeStackNavigator();
 
-export const isFontLoadedAtom = atom(false);
-export const isUserProfileReadyAtom = atom(false);
-export const isClubReadyAtom = atom(false);
-export const isActivityReadyAtom = atom(false);
-export const isAppReadyAtom = atom(false);
-
-export const loadApp = () => {
-  const [, setIsFontLoaded] = useAtom(isFontLoadedAtom);
-  const [isUserProfileReady, setIsUserProfileReady] = useAtom(
-    isUserProfileReadyAtom
+const RouterProvider = () => {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        {Object.values(screensNames).map((ScreenName) => (
+          <Stack.Screen
+            key={ScreenName}
+            name={ScreenName}
+            component={screensComponents[ScreenName]}
+          />
+        ))}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-  const [, setIsClubReady] = useAtom(isClubReadyAtom);
-  const [isActivityReady] = useAtom(isActivityReadyAtom);
-  const [, setIsAppReady] = useAtom(isAppReadyAtom);
-
-  useEffect(() => {
-    isUserProfileReady &&
-      setTimeout(() => {
-        setIsClubReady(true);
-      }, 1000);
-  }, [isUserProfileReady]);
-
-  useEffect(() => {
-    isActivityReady &&
-      setTimeout(() => {
-        setIsAppReady(true);
-      }, 1000);
-  }, [isActivityReady]);
-
-  return () => {
-    setTimeout(() => {
-      setIsFontLoaded(true);
-      setIsUserProfileReady(true);
-    }, 1000);
-  };
 };
 
-export default function App() {
-  const [isFontLoaded] = useAtom(isFontLoadedAtom);
-  const [isUserProfileReady] = useAtom(isUserProfileReadyAtom);
-  const [isClubReady] = useAtom(isClubReadyAtom);
-  const [isActivityReady] = useAtom(isActivityReadyAtom);
-  const [isAppReady] = useAtom(isAppReadyAtom);
+export default RouterProvider;
 
-  return (
-    <View style={styles.container}>
-      <Button title="load data" onPress={loadApp()} />
+/* -------------------------------------------------------------------------- */
+/*                                    Types                                   */
+/* -------------------------------------------------------------------------- */
 
-      <Text>isFontLoaded: {isFontLoaded.toString()}</Text>
-      <Text>isUserProfileReady: {isUserProfileReady.toString()}</Text>
-      <Text>isClubReady: {isClubReady.toString()}</Text>
-      <Text>isActivityReady: {isActivityReady.toString()}</Text>
-      <Text>isAppReady: {isAppReady.toString()}</Text>
-      {isClubReady && <Activity />}
-      <StatusBar style="auto" />
-    </View>
-  );
+type RootStackParamList = { [screenName in keyof typeof screensNames]: any };
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootStackParamList {}
+  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
